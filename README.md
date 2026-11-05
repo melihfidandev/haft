@@ -8,6 +8,8 @@
 
 _Heavy by design._
 
+**[🔗 Live Demo](https://melihfidan-haft.vercel.app)**
+
 ![Next.js](https://img.shields.io/badge/Next.js_16-0b0b0b?style=flat-square&logo=nextdotjs&logoColor=white)
 ![React](https://img.shields.io/badge/React_19-0b0b0b?style=flat-square&logo=react&logoColor=61DAFB)
 ![TypeScript](https://img.shields.io/badge/TypeScript-0b0b0b?style=flat-square&logo=typescript&logoColor=3178C6)
