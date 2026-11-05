@@ -1,0 +1,212 @@
+@import "tailwindcss";
+
+@theme {
+  --breakpoint-xl: 90rem;
+  --breakpoint-2xl: 120rem;
+
+  --color-paper: #ffffff;
+  --color-ink: #0a0a0a;
+  --color-mute: #6b6b6b;
+  --color-line: #e4e4e1;
+  --color-tile: #f2f2f0;
+  --color-night: #0b0b0b;
+  --color-fog: #a3a3a3;
+  --color-split-red: #ff2a1f;
+  --color-split-blue: #1f4bff;
+
+  /* Dev boyutlar genişliğin yanında ekran yüksekliğine de bakar: geniş ama alçak ekranda bölüm bir ekrana sığsın diye. */
+  --text-mega: clamp(4rem, min(1rem + 17vw, 30svh), 22rem);
+  --text-display: clamp(2.75rem, min(1rem + 9vw, 15svh), 11rem);
+  --text-h1: clamp(2.25rem, min(1.2rem + 4.5vw, 9svh), 6rem);
+  --text-h2: clamp(1.5rem, 1.1rem + 2vw, 3rem);
+  --text-lead: clamp(1.125rem, 1rem + 0.6vw, 1.5rem);
+  --text-body: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --text-small: clamp(0.75rem, 0.72rem + 0.15vw, 0.875rem);
+
+  --spacing-gutter: clamp(1rem, 0.5rem + 2.5vw, 3.5rem);
+  --spacing-space-xs: clamp(0.5rem, 0.4rem + 0.5vw, 0.75rem);
+  --spacing-space-s: clamp(1rem, 0.8rem + 1vw, 1.5rem);
+  --spacing-space-m: clamp(1.5rem, 1rem + 2vw, 3rem);
+  --spacing-space-l: clamp(3rem, 2rem + 5vw, 8rem);
+  --spacing-space-xl: clamp(5rem, 3rem + 10vw, 14rem);
+  /* Sabit header'ın kapladığı yükseklik: tam ekran bölümler içeriği bunun altından başlatır. */
+  --spacing-header: 4.75rem;
+
+  --ease-heavy: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-drop: cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+@theme inline {
+  --font-logo: var(--font-badeen), "Arial Black", sans-serif;
+  --font-figure: var(--font-geostar), "Arial Black", sans-serif;
+  --font-display: var(--font-grenze), Georgia, serif;
+  --font-sans: var(--font-geist), "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Türkçe sayfada (html lang="tr") geçerli varyant: büyük harf işaretleri için dev başlıklarda satır aralığı açılır. */
+@custom-variant lang-tr (&:where(:lang(tr), :lang(tr) *));
+
+/*
+ * Satır maskesi: reveal animasyonları için overflow-hidden, ama sıkı satır aralığında Türkçe büyük harf
+ * işaretleri (Ğ, İ, Ö, Ü) kesilmesin diye üstte nefes payı; negatif margin düzeni korur.
+ */
+@utility mask-line {
+  overflow: hidden;
+  padding-top: 0.2em;
+  margin-top: -0.2em;
+}
+
+/*
+ * Ana sayfa kuralı: masaüstünde her bölüm tam bir ekrandır, içerik header'ın altından başlar ve ortalanır.
+ * Mobilde bölüm uzayabilir (min-height), ama asla kısa kalmaz.
+ */
+@utility screen-fit {
+  min-height: 100svh;
+  @media (width >= 48rem) {
+    height: 100svh;
+  }
+}
+
+/* Global taban: Tailwind preflight'ın üstüne marka varsayılanları. */
+@layer base {
+  /* Safari'nin ad/adres alanlarına eklediği kişi kartı (otomatik doldur) düğmesi: tasarımda yok, gizlenir.
+     Otomatik doldurma klavye önerileriyle çalışmaya devam eder. */
+  input::-webkit-contacts-auto-fill-button {
+    visibility: hidden;
+    display: none !important;
+    pointer-events: none;
+  }
+  input::-webkit-credentials-auto-fill-button {
+    visibility: hidden;
+    display: none !important;
+    pointer-events: none;
+  }
+
+  html {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.5;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Tailwind v4 butonlarda varsayılan imleci bırakıyor; tıklanan her şey el imleci göstersin. */
+  button:not(:disabled),
+  [role="button"],
+  [role="radio"]:not([aria-disabled="true"]),
+  summary,
+  label[for],
+  select {
+    cursor: pointer;
+  }
+
+  ::selection {
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+
+  :focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+  }
+}
+
+/* Lenis'in beklediği global kurallar; Tailwind sınıfıyla verilemez çünkü <html>'e kütüphane ekliyor. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: clip;
+}
+.lenis [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+/* Videodaki grenin site geneline yayılan ince karşılığı. SVG gürültüsü pseudo-element olmadan tanımlanamadığı için vanilla CSS. */
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: -50%;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  animation: grain 0.9s steps(6) infinite;
+}
+
+@keyframes grain {
+  0% { transform: translate(0, 0); }
+  20% { transform: translate(-3%, 2%); }
+  40% { transform: translate(2%, -3%); }
+  60% { transform: translate(-2%, -1%); }
+  80% { transform: translate(3%, 3%); }
+  100% { transform: translate(0, 0); }
+}
+
+/* Kromatik kayma: videodaki kırmızı/mavi kanal ayrışmasının hover karşılığı. Çift pseudo-element ve mix-blend gerektiği için vanilla CSS. */
+.split {
+  position: relative;
+  display: inline-block;
+}
+.split::before,
+.split::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: multiply;
+  transition:
+    transform 0.28s var(--ease-heavy),
+    opacity 0.28s var(--ease-heavy);
+}
+.split::before {
+  color: var(--color-split-red);
+}
+.split::after {
+  color: var(--color-split-blue);
+}
+.on-night .split::before,
+.on-night .split::after {
+  mix-blend-mode: screen;
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .split:hover::before,
+  .split:focus-visible::before {
+    opacity: 0.85;
+    transform: translate(-0.06em, 0.02em);
+  }
+  .split:hover::after,
+  .split:focus-visible::after {
+    opacity: 0.85;
+    transform: translate(0.06em, -0.02em);
+  }
+}
+
+/* Sipariş verilirken butonun altındaki "tartı" çubuğu. */
+@keyframes weigh {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grain::after {
+    animation: none;
+  }
+}
